@@ -7,7 +7,7 @@ setup(
     packages=find_namespace_packages(),
     install_requires=[
         'customtkinter',  # Example dependency
-    ]
+    ],
     entry_points={
         'console_scripts': ['start-project = project.gui:main',],
     },
