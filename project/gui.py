@@ -1,6 +1,4 @@
-import tkinter
-import tkinter.messagebox
-from typing import Optional, Tuple, Union
+
 import customtkinter
 
 customtkinter.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
