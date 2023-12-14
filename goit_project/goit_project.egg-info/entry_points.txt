@@ -1,0 +1,2 @@
+[console_scripts]
+startproject = goit_project.gui:main
