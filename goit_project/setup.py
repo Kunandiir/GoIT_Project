@@ -9,6 +9,6 @@ setup(
         'customtkinter', 
     ],
     entry_points={
-        'console_scripts': ['startproject = goit_project.gui:main',],
+        'console_scripts': ['startproject = goit_project.main:main',],
     },
 )
