@@ -14,6 +14,7 @@ class Field():
     def value(self, value):
         self._value = value
 
+# class Birthday validate birthday entered by user
 class Birthday(Field):
 
     @Field.value.setter
@@ -24,6 +25,7 @@ class Birthday(Field):
             else:
                 print(f"Incorect birthday date, use format dd.mm.yy")
 
+# class Record stores all contacts information
 class Record():
     def __init__(self, name, phones = [],mails = [], birthday = None, address = None) -> None:
         self.name = name
@@ -32,6 +34,7 @@ class Record():
         self.address = address
         self.birthday = Birthday(birthday)
 
+    # to see what Record contains
     def __str__(self) -> str:
         return f"Name: {self.name}, Phones: {[phone for phone in self.phones]}, Mails: {[mail for mail in self.mails]}, Birthday: {self.birthday.value}, Address: {self.address}"
     
@@ -44,7 +47,7 @@ class PersonalAssistant:
         self.contacts = []
         self.notes = []
 
-    # task 1
+    # task_1/ creates Record object and put it in contacts list for later use
     def add_contact(self):
         
         inputs = input('Enter name: ')
@@ -59,32 +62,14 @@ class PersonalAssistant:
         record.address = inputs
         self.contacts.append(record)
         
-
-
-        today = datetime.today()
-        next_birthday = today.date() + timedelta(days=20)
-        ignor_year = record.birthday.value.replace(year=today.year) #to ignore year
-        print(f'vompare nextday: {ignor_year <= next_birthday}')
-        print(self.contacts[0].birthday.value)
-
-    # task 2
+    # task_2/ return a list of contacts whose birthday is after a specified number of days from the current date
     def get_birthdays(self):
         days = int(input('Enter amount of days: '))
         today = datetime.today()
-        print(f'Today: {today}')
         next_birthday = today.date() + timedelta(days=days)
         for user in self.contacts:
-            
             ignor_year = user.birthday.value.replace(year=today.year) #to ignore year
-            print(f'ignor_year: {ignor_year}')
-            print(f'compare: {today.date() <= ignor_year <= next_birthday}')
-            print(f'vompare today: {today.date() <= ignor_year}')
-            print(f'vompare nextday: {ignor_year <= next_birthday}')
-            print(f'compare actual dates: {datetime(2023,12,26) <= datetime(2024,1,5)}')
-            print(f'Today: {today}')
-            print(f'next_birthday: {next_birthday}')
             if today.date() <= ignor_year <= next_birthday:
-                print('ffffff')
                 print(f'\n{user.name}, {user.phones}')
 
         
