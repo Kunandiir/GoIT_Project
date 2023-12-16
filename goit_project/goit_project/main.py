@@ -17,6 +17,7 @@ class Field():
     def value(self, value):
         self._value = value
 
+# class Birthday validate birthday entered by user
 class Birthday(Field):
 
     @Field.value.setter
@@ -27,6 +28,7 @@ class Birthday(Field):
             else:
                 print(f"Incorect birthday date, use format dd.mm.yy")
 
+# class Record stores all contacts information
 class Record():
     def __init__(self, name, phones = [],mails = [], birthday = None, address = None) -> None:
         self.name = name
@@ -35,6 +37,7 @@ class Record():
         self.address = address
         self.birthday = Birthday(birthday)
 
+    # to see what Record contains
     def __str__(self) -> str:
         return f"Name: {self.name}, Phones: {[phone for phone in self.phones]}, Mails: {[mail for mail in self.mails]}, Birthday: {self.birthday.value}, Address: {self.address}"
     
@@ -46,8 +49,7 @@ class PersonalAssistant:
     def __init__(self):
         self.contacts = []
         self.notes = []
-    
-    # Task 1 and 3
+
     def add_contact(self):
         
         inputs = input('Enter name: ')
@@ -81,40 +83,50 @@ class PersonalAssistant:
         record.address = inputs
         self.contacts.append(record)
         
-
-
-        today = datetime.today()
-        next_birthday = today.date() + timedelta(days=20)
-        ignor_year = record.birthday.value.replace(year=today.year) #to ignore year
-        print(f'vompare nextday: {ignor_year <= next_birthday}')
-        print(self.contacts[0].birthday.value)
-
-    # task 2
+    # task_2/ return a list of contacts whose birthday is after a specified number of days from the current date
     def get_birthdays(self):
         days = int(input('Enter amount of days: '))
         today = datetime.today()
-        print(f'Today: {today}')
         next_birthday = today.date() + timedelta(days=days)
         for user in self.contacts:
-            
             ignor_year = user.birthday.value.replace(year=today.year) #to ignore year
-            print(f'ignor_year: {ignor_year}')
-            print(f'compare: {today.date() <= ignor_year <= next_birthday}')
-            print(f'vompare today: {today.date() <= ignor_year}')
-            print(f'vompare nextday: {ignor_year <= next_birthday}')
-            print(f'compare actual dates: {datetime(2023,12,26) <= datetime(2024,1,5)}')
-            print(f'Today: {today}')
-            print(f'next_birthday: {next_birthday}')
             if today.date() <= ignor_year <= next_birthday:
-                print('ffffff')
                 print(f'\n{user.name}, {user.phones}')
 
 
-    def task_4(self):
-        4+4
 
-    def task_5(self):
-        5+5
+    # task 4
+    def search_contact(self, name):
+        for contact in self.contacts:
+            if contact.name.lower() == name.lower():
+                return contact
+        print(f'Contact {name} not found.')
+        return None
+
+    # task 5
+    def redaction_contact(self, name):
+        contact = self.search_contact(name) # проходимся по контактах
+        if contact:
+            print('Enter new information:')
+            new_name = input('Enter new name: ')
+            new_phones = input('Enter new phone(s) separated by commas: ').split(',')
+            new_mails = input('Enter new email(s) separated by commas: ').split(',')
+            new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
+            new_address = input('Enter new address: ')
+
+            contact.name = new_name
+            contact.phone = [phone.strip() for phone in new_phones]
+            contact.birthday = Birthday(new_birthday)
+            contact.mails = [mail.strip() for mail in new_mails]   
+            contact.address = new_address
+            print(f'Contact {name} redactioned successfully')
+
+    def delete_contact(self, name):
+        contact = self.search_contact(name) #проходимся по контактах
+        if contact:
+            self.contacts.remove(contact)
+            print(f'Contact {name} deleted successfully')
+
 
     def task_6(self):
         6+6
@@ -150,6 +162,13 @@ def main():
             assistant.add_contact()
         elif command == "birthday_day":
             assistant.get_birthdays()
+        elif command == 'search_contact':
+            assistant.search_contact()
+        elif command == 'redaction_contact':
+            assistant.redaction_contact()
+        elif command == 'delete_contact':
+            assistant.delete_contact()
+            
         elif command == 'exit':
             print("Goodbye!")
             break
