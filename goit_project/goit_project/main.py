@@ -93,11 +93,39 @@ class PersonalAssistant:
     def task_3(self):
         3+3
 
-    def task_4(self):
-        4+4
 
-    def task_5(self):
-        5+5
+    # task 4
+    def search_contact(self, name):
+        for contact in self.contacts:
+            if contact.name.lower() == name.lower():
+                return contact
+        print(f'Contact {name} not found.')
+        return None
+
+    # task 5
+    def redaction_contact(self, name):
+        contact = self.search_contact(name) # проходимся по контактах
+        if contact:
+            print('Enter new information:')
+            new_name = input('Enter new name: ')
+            new_phones = input('Enter new phone(s) separated by commas: ').split(',')
+            new_mails = input('Enter new email(s) separated by commas: ').split(',')
+            new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
+            new_address = input('Enter new address: ')
+
+            contact.name = new_name
+            contact.phone = [phone.strip() for phone in new_phones]
+            contact.birthday = Birthday(new_birthday)
+            contact.mails = [mail.strip() for mail in new_mails]   
+            contact.address = new_address
+            print(f'Contact {name} redactioned successfully')
+
+    def delete_contact(self, name):
+        contact = self.search_contact(name) #проходимся по контактах
+        if contact:
+            self.contacts.remove(contact)
+            print(f'Contact {name} deleted successfully')
+
 
     def task_6(self):
         6+6
@@ -133,6 +161,13 @@ def main():
             assistant.add_contact()
         elif command == "birthday_day":
             assistant.get_birthdays()
+        elif command == 'search_contact':
+            assistant.search_contact()
+        elif command == 'redaction_contact':
+            assistant.redaction_contact()
+        elif command == 'delete_contact':
+            assistant.delete_contact()
+            
         elif command == 'exit':
             print("До побачення!")
             break
