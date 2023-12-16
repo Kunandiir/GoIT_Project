@@ -90,6 +90,8 @@ class PersonalAssistant:
         next_birthday = today.date() + timedelta(days=days)
         for user in self.contacts:
             ignor_year = user.birthday.value.replace(year=today.year) #to ignore year
+            if ignor_year < today.date():
+                ignor_year = ignor_year.replace(year = today.year +1)
             if today.date() <= ignor_year <= next_birthday:
                 print(f'\n{user.name}, {user.phones}')
 
