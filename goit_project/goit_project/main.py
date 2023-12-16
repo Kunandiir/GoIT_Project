@@ -1,5 +1,8 @@
 
 from datetime import datetime,timedelta
+import re
+
+email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class Field():
     def __init__(self, value):
@@ -47,17 +50,35 @@ class PersonalAssistant:
         self.contacts = []
         self.notes = []
 
-    # task_1/ creates Record object and put it in contacts list for later use
     def add_contact(self):
         
         inputs = input('Enter name: ')
         record = Record(inputs)
-        inputs = input('Enter phone number: ')
-        record.phones.append(inputs)
-        inputs = input('Enter maill: ')
-        record.mails.append(inputs)
-        inputs = input('Enter birthday: ')
-        record.birthday = Birthday(inputs)
+
+        while True:
+            inputs = input('Enter phone number: ')
+            if not inputs or not inputs.isdigit():
+                print("Invalid phone number. Please provide a valid numeric phone number.")
+            else:
+                record.phones.append(inputs)
+                break
+
+        while True:
+            inputs = input('Enter maill: ')
+            if not inputs or not re.match(email_regex, inputs):
+                print("Invalid email. Please provide a valid email address.")
+            else:
+                record.mails.append(inputs)
+                break
+
+        while True:
+            inputs = input('Enter birthday (dd.mm.yyyy): ')
+            try:
+                record.birthday = Birthday(inputs)
+                break
+            except ValueError:
+                print("Incorrect birthday date format. Use the format dd.mm.yyyy.")      
+
         inputs = input('Enter address: ')
         record.address = inputs
         self.contacts.append(record)
@@ -72,11 +93,6 @@ class PersonalAssistant:
             if today.date() <= ignor_year <= next_birthday:
                 print(f'\n{user.name}, {user.phones}')
 
-        
-
-
-    def task_3(self):
-        3+3
 
 
     # task 4
@@ -137,11 +153,11 @@ class PersonalAssistant:
 def main():
     assistant = PersonalAssistant()
     while True:
-        print("\nВведіть команду (для допомоги введіть 'help'):")
+        print("\nEnter the command (For a list of available commands, enter 'help'):")
         command = input("> ").lower()
 
         if command == 'help':
-            print("Доступні команди: exit")
+            print("Available commands: exit, add_contact, birthday_day")
         elif command == 'add_contact':
             assistant.add_contact()
         elif command == "birthday_day":
@@ -154,11 +170,11 @@ def main():
             assistant.delete_contact()
             
         elif command == 'exit':
-            print("До побачення!")
+            print("Goodbye!")
             break
 
         else:
-            print("Невідома команда. Введіть 'help' для списку доступних команд.")
+            print("Unknown command. Type 'help' for a list of available commands")
 
 if __name__ == "__main__":
     main()
