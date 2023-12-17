@@ -104,9 +104,12 @@ class PersonalAssistant:
     def search_contact(self, name):
         for contact in self.contacts:
             if contact.name.lower() == name.lower():
-                return contact
-        print(f'Contact {name} not found.')
-        return None
+                result = print(f'{contact}')
+                return result
+            else:
+                print(f'Contact {name} not found.')
+                break
+        
 
     # task 5
     def redaction_contact(self, name):
@@ -324,17 +327,20 @@ def main():
         command = input("> ").lower()
 
         if command == 'help':
-            print("Available commands: exit, add_contact, birthday_day")
+            print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
         elif command == 'add_contact':
             assistant.add_contact()
         elif command == "birthday_day":
             assistant.get_birthdays()
         elif command == 'search_contact':
-            assistant.search_contact()
+            name = input('Enter name to search: ')
+            assistant.search_contact(name)
         elif command == 'redaction_contact':
-            assistant.redaction_contact()
+            name = input('Enter contact name to redaction: ')
+            assistant.redaction_contact(name)
         elif command == 'delete_contact':
-            assistant.delete_contact()
+            name = input('Enter contact name to delete: ')
+            assistant.delete_contact(name)
         elif command.lower() == 'clean':
             path = input("Write a path: ")
             
