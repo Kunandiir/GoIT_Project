@@ -33,10 +33,10 @@ class Birthday(Field):
 
 # class Record stores all contacts information
 class Record():
-    def __init__(self, name, phones = [],mails = [], birthday = None, address = None) -> None:
+    def __init__(self, name, birthday = None, address = None) -> None:
         self.name = name
-        self.phones = phones
-        self.mails = mails
+        self.phones = []
+        self.mails = []
         self.address = address
         self.birthday = Birthday(birthday)
 
