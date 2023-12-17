@@ -104,16 +104,17 @@ class PersonalAssistant:
     def search_contact(self, name):
         for contact in self.contacts:
             if contact.name.lower() == name.lower():
-                result = print(f'{contact}')
-                return result
+                print(f'{contact}')
+                return contact
             else:
                 print(f'Contact {name} not found.')
                 break
         
 
     # task 5
-    def redaction_contact(self, name):
+    def edit_contact(self, name):
         contact = self.search_contact(name) # проходимся по контактах
+        print(contact)
         if contact:
             print('Enter new information:')
             new_name = input('Enter new name: ')
@@ -121,12 +122,16 @@ class PersonalAssistant:
             new_mails = input('Enter new email(s) separated by commas: ').split(',')
             new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
             new_address = input('Enter new address: ')
-
-            contact.name = new_name
-            contact.phone = [phone.strip() for phone in new_phones]
-            contact.birthday = Birthday(new_birthday)
-            contact.mails = [mail.strip() for mail in new_mails]   
-            contact.address = new_address
+            if new_name != '':
+                contact.name = new_name
+            elif new_phones != '':
+                contact.phone = [phone.strip() for phone in new_phones]
+            elif new_mails != '':
+                contact.birthday = Birthday(new_birthday)
+            elif new_birthday != '':
+                contact.mails = [mail.strip() for mail in new_mails]  
+            elif new_address != '': 
+                contact.address = new_address
             print(f'Contact {name} redactioned successfully')
 
     def delete_contact(self, name):
@@ -335,9 +340,9 @@ def main():
         elif command == 'search_contact':
             name = input('Enter name to search: ')
             assistant.search_contact(name)
-        elif command == 'redaction_contact':
-            name = input('Enter contact name to redaction: ')
-            assistant.redaction_contact(name)
+        elif command == 'edit_contact':
+            name = input('Enter contact name to edit: ')
+            assistant.edit_contact(name)
         elif command == 'delete_contact':
             name = input('Enter contact name to delete: ')
             assistant.delete_contact(name)
