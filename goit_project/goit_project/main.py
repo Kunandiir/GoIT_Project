@@ -57,8 +57,8 @@ class PersonalAssistant:
 
         while True:
             inputs = input('Enter phone number: ')
-            if not inputs or not inputs.isdigit():
-                print("Invalid phone number. Please provide a valid numeric phone number.")
+            if not re.match(r'^\+\d{1,4}\d{6,}$', inputs):
+                print("Invalid phone number. Please provide a valid numeric phone number (one to four digits (the country code) and at least six more digits).")
             else:
                 record.phones.append(inputs)
                 break
