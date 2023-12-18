@@ -4,6 +4,9 @@ import re
 from pathlib import Path
 import shutil
 import sys
+from prompt_toolkit import prompt
+from prompt_toolkit.completion import WordCompleter
+#pip install prompt_toolkit
 
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
@@ -327,9 +330,12 @@ class CleanFolder():
 
 def main():
     assistant = PersonalAssistant()
+    commands = ['add_contact',"birthday_day",'help','search_contact',
+                'edit_contact','delete_contact','clean','exit']
+    completer = WordCompleter(commands, ignore_case=True)
     while True:
         print("\nEnter the command (For a list of available commands, enter 'help'):")
-        command = input("> ").lower()
+        command = prompt("> ",completer=completer).lower()
 
         if command == 'help':
             print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
