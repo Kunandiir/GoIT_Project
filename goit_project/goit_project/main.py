@@ -345,14 +345,15 @@ class CleanFolder():
 def main():
     nbook = NoteBook()
     nbook.dump_note()
-    
+
     assistant = PersonalAssistant()
-    commands = ['add_contact',"birthday_day",'help','search_contact',
-                'edit_contact','delete_contact','clean','exit']
+    commands = ['add_contact', "birthday_day", 'help', 'search_contact',
+                'edit_contact', 'delete_contact', 'clean', 'exit']
     completer = WordCompleter(commands, ignore_case=True)
+
     while True:
         print("\nEnter the command (For a list of available commands, enter 'help'):")
-        command = prompt("> ",completer=completer).lower()
+        command = prompt("> ", completer=completer).lower()
 
         try:
             if command == 'help':
@@ -372,47 +373,48 @@ def main():
                 assistant.delete_contact(name)
             elif command.lower() == 'clean':
                 path = input("Write a path: ")
-                
+
                 if Path(path).exists():
                     folder_process = Path(path).resolve()
                     CleanFolder.main(folder_process)
                     print("Done")
-                else: 
+                else:
                     print("You wrote a wrong directory")
-                
+
             elif command == 'exit':
                 print("Goodbye!")
                 break
-        
-            table = Table(
+
+            elif command in ['add-note', 'all-note', 'sort-note', 'find-note', 'change-note', 'delete-note', 'close', 'exit', 'good bye']:
+                table = Table(
                     Column(header='Name', justify='center'),
                     Column(header='Description', justify='center'),
                     Column(header='Tag', justify='center'),
                     Column(header='Date', justify='center'),
                     title='NoteBook',
                     show_lines=True
-                    )
+                )
 
-            if command == 'add-note':
-                nbook.add_note(table)
-            elif command == 'all-note':
-                nbook.all_note(table)
-            elif command == 'sort-note':
-                nbook.sort_note(table)
-            elif command == 'find-note':
-                nbook.find_note(table)
-            elif command == 'change-note':
-                nbook.change_note(table)
-            elif command == 'delete-note':
-                nbook.delete_note(table)
-            elif command in ['close', 'exit', 'good bye']:
-                print(nbook.bye())
+                if command == 'add-note':
+                    nbook.add_note(table)
+                elif command == 'all-note':
+                    nbook.all_note(table)
+                elif command == 'sort-note':
+                    nbook.sort_note(table)
+                elif command == 'find-note':
+                    nbook.find_note(table)
+                elif command == 'change-note':
+                    nbook.change_note(table)
+                elif command == 'delete-note':
+                    nbook.delete_note(table)
+                elif command in ['close', 'exit', 'good bye']:
+                    print(nbook.bye())
+                else:
+                    print("Unknown command. Type 'help' for a list of available commands")
             else:
                 print("Unknown command. Type 'help' for a list of available commands")
         finally:
             nbook.load_note()
-
-        
 
 if __name__ == "__main__":
     main()
