@@ -7,6 +7,10 @@ import sys
 from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 #pip install prompt_toolkit
+import os
+import atexit
+import pickle
+
 
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
@@ -55,6 +59,25 @@ class PersonalAssistant:
     def __init__(self):
         self.contacts = []
         self.notes = []
+        self.file_path = Path.home() / "personal_assistant_data.pkl"
+        self.load_data()
+        atexit.register(self.save_data_on_exit)  # Register the function for atexit
+
+    def load_data(self):
+        if self.file_path.exists():
+            with open(self.file_path, "rb") as file:
+                saved_data = pickle.load(file)
+                self.contacts = saved_data.get("contacts", [])
+                self.notes = saved_data.get("notes", [])
+
+    def save_data(self):
+        data_to_save = {"contacts": self.contacts, "notes": self.notes}
+        with open(self.file_path, "wb") as file:
+            pickle.dump(data_to_save, file)
+
+    def save_data_on_exit(self):
+        self.save_data()
+        print("Data saved before exiting.")
 
     def add_contact(self):
         
