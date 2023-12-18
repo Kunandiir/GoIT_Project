@@ -50,10 +50,10 @@ class NoteBook(UserList):
 
     def change_note(self, table: Table):
         while True:
-            note = self.find_note()
+            note = self.find_note(table)
             if not note:
                 continue
-            yn = Prompt.ask(f'Цю нотатку ви бажди знайти?', choices=['y','n'])
+            yn = Prompt.ask(f'Цю нотатку ви бажали знайти?', choices=['y','n'])
             if yn == 'y':
                 key = Prompt.ask('Введіть параметр який бажаєте змінити', choices=['name', 'desc', 'tag'])
                 value = input('Введіть значення: ')
@@ -65,19 +65,14 @@ class NoteBook(UserList):
 
     def delete_note(self, table: Table):
         while True:
-            note = self.find_note()
+            note = self.find_note(table)
             if not note:
                 continue
-            yn = Prompt.ask(f'Цю нотатку ви бажди знайти?', choices=['y','n'])
-            if yn == 'y':
-                key = Prompt.ask('Введіть параметр', choices=['name', 'desc', 'tag'])
-                value = input('Введіть значення: ')
-                for note in self.data:
-                    if value in note[key]:
-                        self.data.remove(note)
-                        table.add_row(note['name'], note['desc'], note['tag'], note['date'])
-                        self.console.print(table)
-                        break
+            yn = Prompt.ask(f'Цю нотатку ви бажали знайти?', choices=['y','n'])
+            if yn == 'y':           
+                self.data.remove(note)
+                self.console.print(table)
+                break
 
     
     
