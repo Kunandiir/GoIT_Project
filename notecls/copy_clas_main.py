@@ -26,7 +26,7 @@ class NoteBook(UserList):
         super().__init__()
       
       
-    def add_note(self, table):
+    def add_note(self, table: Table):
         record = Note(input('Enter name: '), input('Enter desc: '), input('Enter tag: '))
         dict_record = {'name': record.name, 'desc': record.desc, 'tag': record.tag, 'date': record.date}
         self.data.append(dict_record)
