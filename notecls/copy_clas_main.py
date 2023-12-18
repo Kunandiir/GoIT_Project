@@ -21,37 +21,25 @@ class Note:
 class NoteBook(UserList):
     def __init__(self):
         self.console = Console()
-        self.db = sqlite3.connect('notecls/notes.db')
+        self.db = sqlite3.connect('notes.db')
         self.cursor = self.db.cursor()
         super().__init__()
       
       
-    def add_note(self):
+    def add_note(self, table):
         record = Note(input('Enter name: '), input('Enter desc: '), input('Enter tag: '))
         dict_record = {'name': record.name, 'desc': record.desc, 'tag': record.tag, 'date': record.date}
         self.data.append(dict_record)
-        table = Table(
-            Column(header='Name', justify='center'),
-            Column(header='Description', justify='center'),
-            Column(header='Tag', justify='center'),
-            Column(header='Date', justify='center'),
-            title='NoteBook')
         table.add_row(dict_record['name'], dict_record['desc'], dict_record['tag'], dict_record['date'])
         self.console.print(table)
         
 
-    def find_note(self):
+    def find_note(self, table: Table):
         if self.data:
             key = Prompt.ask('Введіть параметр', choices=['name', 'desc', 'tag'])
             value = input('Введіть значення: ')
             for note in self.data:
                 if value in note[key]:
-                    table = Table(
-                        Column(header='Name', justify='center'),
-                        Column(header='Description', justify='center'),
-                        Column(header='Tag', justify='center'),
-                        Column(header='Date', justify='center'),
-                        title='NoteBook')
                     table.add_row(note['name'], note['desc'], note['tag'], note['date'])
                     self.console.print(table)
                     return note
@@ -60,7 +48,7 @@ class NoteBook(UserList):
             self.console.print('[bold red]Нотатки пусті[/]')
 
 
-    def change_note(self):
+    def change_note(self, table: Table):
         while True:
             note = self.find_note()
             if not note:
@@ -70,18 +58,12 @@ class NoteBook(UserList):
                 key = Prompt.ask('Введіть параметр який бажаєте змінити', choices=['name', 'desc', 'tag'])
                 value = input('Введіть значення: ')
                 note[key] = value
-                table = Table(
-                        Column(header='Name', justify='center'),
-                        Column(header='Description', justify='center'),
-                        Column(header='Tag', justify='center'),
-                        Column(header='Date', justify='center'),
-                        title='NoteBook')
                 table.add_row(note['name'], note['desc'], note['tag'], note['date'])
                 self.console.print(table)
                 break
 
 
-    def delete_note(self):
+    def delete_note(self, table: Table):
         while True:
             note = self.find_note()
             if not note:
@@ -93,12 +75,6 @@ class NoteBook(UserList):
                 for note in self.data:
                     if value in note[key]:
                         self.data.remove(note)
-                        table = Table(
-                                Column(header='Name', justify='center'),
-                                Column(header='Description', justify='center'),
-                                Column(header='Tag', justify='center'),
-                                Column(header='Date', justify='center'),
-                                title='NoteBook')
                         table.add_row(note['name'], note['desc'], note['tag'], note['date'])
                         self.console.print(table)
                         break
@@ -133,15 +109,21 @@ def main():
     nbook.dump_note()
     while True:
         try:
+            table = Table(
+                    Column(header='Name', justify='center'),
+                    Column(header='Description', justify='center'),
+                    Column(header='Tag', justify='center'),
+                    Column(header='Date', justify='center'),
+                    title='NoteBook')
             enter = Prompt.ask('[blue]Enter command[/]').lower().strip()
             if enter == 'add-note':
-                nbook.add_note()
+                nbook.add_note(table)
             elif enter == 'find-note':
-                nbook.find_note()
+                nbook.find_note(table)
             elif enter == 'change-note':
-                nbook.change_note()
+                nbook.change_note(table)
             elif enter == 'delete-note':
-                nbook.delete_note()
+                nbook.delete_note(table)
             elif enter in ['close', 'exit', 'good bye']:
                 print(nbook.bye())
             else:
