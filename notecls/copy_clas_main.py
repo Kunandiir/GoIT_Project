@@ -21,7 +21,7 @@ class Note:
 class NoteBook(UserList):
     def __init__(self):
         self.console = Console()
-        self.db = sqlite3.connect('notes.db')
+        self.db = sqlite3.connect('notecls/notes.db')
         self.cursor = self.db.cursor()
         super().__init__()
       
@@ -31,6 +31,19 @@ class NoteBook(UserList):
         dict_record = {'name': record.name, 'desc': record.desc, 'tag': record.tag, 'date': record.date}
         self.data.append(dict_record)
         table.add_row(dict_record['name'], dict_record['desc'], dict_record['tag'], dict_record['date'])
+        self.console.print(table)
+        
+    
+    def all_note(self, table: Table):
+        for note in self.data:
+            table.add_row(note['name'], note['desc'], note['tag'], note['date'])
+        self.console.print(table)
+        
+    
+    def sort_note(self, table: Table):
+        self.cursor.execute("SELECT * FROM cls_notes ORDER BY tag")
+        for note in self.cursor.fetchall():
+            table.add_row(note[0], note[1], note[2], note[3])
         self.console.print(table)
         
 
@@ -93,8 +106,7 @@ class NoteBook(UserList):
         # print('Dump')
 
     def bye(self):
-        
-        print('Good bye!')
+        self.console.print('[green]Good bye![/]❤️')
         return exit()
 
 
@@ -109,10 +121,16 @@ def main():
                     Column(header='Description', justify='center'),
                     Column(header='Tag', justify='center'),
                     Column(header='Date', justify='center'),
-                    title='NoteBook')
+                    title='NoteBook',
+                    show_lines=True
+                    )
             enter = Prompt.ask('[blue]Enter command[/]').lower().strip()
             if enter == 'add-note':
                 nbook.add_note(table)
+            elif enter == 'all-note':
+                nbook.all_note(table)
+            elif enter == 'sort-note':
+                nbook.sort_note(table)
             elif enter == 'find-note':
                 nbook.find_note(table)
             elif enter == 'change-note':
