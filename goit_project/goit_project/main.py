@@ -8,14 +8,10 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 #pip install prompt_toolkit
 
-from collections import UserList
-from datetime import datetime
-import sqlite3
-
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table, Column
-from notes import Note, NoteBook
+from notes import NoteBook
 
 
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
