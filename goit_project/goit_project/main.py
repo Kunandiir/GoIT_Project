@@ -8,6 +8,16 @@ from prompt_toolkit import prompt
 from prompt_toolkit.completion import WordCompleter
 #pip install prompt_toolkit
 
+from collections import UserList
+from datetime import datetime
+import sqlite3
+
+from rich.console import Console
+from rich.prompt import Prompt
+from rich.table import Table, Column
+from notes import Note, NoteBook
+
+
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
 
 class Field():
@@ -143,21 +153,6 @@ class PersonalAssistant:
             self.contacts.remove(contact)
             print(f'Contact {name} deleted successfully')
 
-
-    def task_6(self):
-        6+6
-
-    def task_7(self):
-        7+7
-
-    def task_8(self):
-        8+8
-
-    def task_9(self):
-        9+9
-
-    def task_10(self):
-        10+10
 
 #    task_11(self):
 
@@ -329,6 +324,9 @@ class CleanFolder():
 
 
 def main():
+    nbook = NoteBook()
+    nbook.dump_note()
+    
     assistant = PersonalAssistant()
     commands = ['add_contact',"birthday_day",'help','search_contact',
                 'edit_contact','delete_contact','clean','exit']
@@ -337,37 +335,65 @@ def main():
         print("\nEnter the command (For a list of available commands, enter 'help'):")
         command = prompt("> ",completer=completer).lower()
 
-        if command == 'help':
-            print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
-        elif command == 'add_contact':
-            assistant.add_contact()
-        elif command == "birthday_day":
-            assistant.get_birthdays()
-        elif command == 'search_contact':
-            name = input('Enter name to search: ')
-            assistant.search_contact(name)
-        elif command == 'edit_contact':
-            name = input('Enter contact name to edit: ')
-            assistant.edit_contact(name)
-        elif command == 'delete_contact':
-            name = input('Enter contact name to delete: ')
-            assistant.delete_contact(name)
-        elif command.lower() == 'clean':
-            path = input("Write a path: ")
-            
-            if Path(path).exists():
-                folder_process = Path(path).resolve()
-                CleanFolder.main(folder_process)
-                print("Done")
-            else: 
-                print("You wrote a wrong directory")
-            
-        elif command == 'exit':
-            print("Goodbye!")
-            break
+        try:
+            if command == 'help':
+                print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
+            elif command == 'add_contact':
+                assistant.add_contact()
+            elif command == "birthday_day":
+                assistant.get_birthdays()
+            elif command == 'search_contact':
+                name = input('Enter name to search: ')
+                assistant.search_contact(name)
+            elif command == 'edit_contact':
+                name = input('Enter contact name to edit: ')
+                assistant.edit_contact(name)
+            elif command == 'delete_contact':
+                name = input('Enter contact name to delete: ')
+                assistant.delete_contact(name)
+            elif command.lower() == 'clean':
+                path = input("Write a path: ")
+                
+                if Path(path).exists():
+                    folder_process = Path(path).resolve()
+                    CleanFolder.main(folder_process)
+                    print("Done")
+                else: 
+                    print("You wrote a wrong directory")
+                
+            elif command == 'exit':
+                print("Goodbye!")
+                break
+        
+            table = Table(
+                    Column(header='Name', justify='center'),
+                    Column(header='Description', justify='center'),
+                    Column(header='Tag', justify='center'),
+                    Column(header='Date', justify='center'),
+                    title='NoteBook',
+                    show_lines=True
+                    )
 
-        else:
-            print("Unknown command. Type 'help' for a list of available commands")
+            if command == 'add-note':
+                nbook.add_note(table)
+            elif command == 'all-note':
+                nbook.all_note(table)
+            elif command == 'sort-note':
+                nbook.sort_note(table)
+            elif command == 'find-note':
+                nbook.find_note(table)
+            elif command == 'change-note':
+                nbook.change_note(table)
+            elif command == 'delete-note':
+                nbook.delete_note(table)
+            elif command in ['close', 'exit', 'good bye']:
+                print(nbook.bye())
+            else:
+                print("Unknown command. Type 'help' for a list of available commands")
+        finally:
+            nbook.load_note()
+
+        
 
 if __name__ == "__main__":
     main()

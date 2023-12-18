@@ -21,7 +21,7 @@ class Note:
 class NoteBook(UserList):
     def __init__(self):
         self.console = Console()
-        self.db = sqlite3.connect('notecls/notes.db')
+        self.db = sqlite3.connect('goit_project/goit_project/notes.db')
         self.cursor = self.db.cursor()
         super().__init__()
       
