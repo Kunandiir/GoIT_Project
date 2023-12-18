@@ -6,7 +6,7 @@ setup(
     version='1.0',
     packages=find_namespace_packages(),
     install_requires=[
-        'customtkinter', 
+        'prompt_toolkit','rich',
     ],
     entry_points={
         'console_scripts': ['startproject = goit_project.main:main',],
