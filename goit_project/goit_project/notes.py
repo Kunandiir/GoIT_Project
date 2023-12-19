@@ -1,7 +1,7 @@
 from collections import UserList
 from datetime import datetime
 import sqlite3
-
+from pathlib import Path
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table, Column
@@ -21,10 +21,21 @@ class Note:
 class NoteBook(UserList):
     def __init__(self):
         self.console = Console()
-        self.db = sqlite3.connect('goit_project/goit_project/notes.db')
+        self.db = sqlite3.connect(f'{Path.home()}/notes.db')
         self.cursor = self.db.cursor()
         super().__init__()
       
+    
+    def create_table(self):
+        self.cursor.execute(
+                '''CREATE TABLE cls_notes (
+                name TEXT,
+                desc STR,
+                tag STR,
+                date DATE)'''
+            )
+        self.db.commit()
+        
       
     def add_note(self, table: Table):
         record = Note(input('Enter name: '), input('Enter desc: '), input('Enter tag: '))
@@ -114,6 +125,12 @@ class NoteBook(UserList):
 def main():
     nbook = NoteBook()
     nbook.dump_note()
+    
+    try:
+        nbook.create_table()
+    except:
+        pass
+    
     while True:
         try:
             table = Table(
