@@ -117,6 +117,10 @@ class PersonalAssistant:
         inputs = input('Enter address: ')
         record.address = inputs
         self.contacts.append(record)
+    
+    def show_contacts(self):
+        for contact in self.contacts:
+            print('Name: ' + contact.name + ', phones: ' + ','.join(contact.phones) + ', mails: ' + ','.join(contact.mails) + ', address: ' + contact.address + ', birthday: ' + str(contact.birthday.value))
         
     # task_2/ return a list of contacts whose birthday is after a specified number of days from the current date
     def get_birthdays(self):
@@ -347,7 +351,7 @@ def main():
     nbook.dump_note()
 
     assistant = PersonalAssistant()
-    commands = ['add_contact', "birthday_day", 'help', 'search_contact',
+    commands = ['add_contact','show_contacts', "birthday_day", 'help', 'search_contact',
                 'edit_contact', 'delete_contact', 'clean', 'exit']
     completer = WordCompleter(commands, ignore_case=True)
 
@@ -360,6 +364,8 @@ def main():
                 print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
             elif command == 'add_contact':
                 assistant.add_contact()
+            elif command == 'show_contacts':
+                assistant.show_contacts()
             elif command == "birthday_day":
                 assistant.get_birthdays()
             elif command == 'search_contact':
