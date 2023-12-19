@@ -349,12 +349,13 @@ class CleanFolder():
 
 def main():
     nbook = NoteBook()
-    nbook.dump_note()
     
     try:
         nbook.create_table()
     except:
         pass
+    
+    nbook.dump_note()
 
     assistant = PersonalAssistant()
     commands = ['add_contact','show_contacts', "birthday_day", 'help', 'search_contact',

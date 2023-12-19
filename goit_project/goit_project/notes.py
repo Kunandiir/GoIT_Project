@@ -124,13 +124,13 @@ class NoteBook(UserList):
 
 def main():
     nbook = NoteBook()
-    nbook.dump_note()
-    
+
     try:
         nbook.create_table()
     except:
-        pass
+        pass    
     
+    nbook.dump_note()
     while True:
         try:
             table = Table(
