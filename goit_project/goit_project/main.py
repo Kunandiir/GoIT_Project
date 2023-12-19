@@ -352,7 +352,8 @@ def main():
 
     assistant = PersonalAssistant()
     commands = ['add_contact','show_contacts', "birthday_day", 'help', 'search_contact',
-                'edit_contact', 'delete_contact', 'clean', 'exit']
+                'edit_contact', 'delete_contact', 'clean', 'exit','add-note','sort-note',
+                'find-note','change-note','delete-note','close','good bye']
     completer = WordCompleter(commands, ignore_case=True)
 
     while True:
