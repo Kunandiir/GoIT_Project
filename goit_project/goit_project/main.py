@@ -68,6 +68,7 @@ class PersonalAssistant:
         self.file_path = Path.home() / "personal_assistant_data.pkl"
         self.load_data()
         atexit.register(self.save_data_on_exit)  # Register the function for atexit
+        self.console = Console()
 
     def load_data(self):
         if self.file_path.exists():
@@ -137,14 +138,14 @@ class PersonalAssistant:
 
 
     # task 4
-    def search_contact(self, name):
+    def search_contact(self, name, table_adressbook):
         for contact in self.contacts:
             if contact.name.lower() == name.lower():
-                print(f'{contact}')
-                return contact
-            else:
-                print(f'Contact {name} not found.')
-                break
+                table_adressbook.add_row(contact.name, ",".join(contact.phones), ",".join(contact.mails), str(contact.birthday.value), contact.address)
+                self.console.print(table_adressbook)
+                return contact    
+        self.console.print(f'[red]Contact {name} not found.[/]')
+                
         
 
     # task 5
@@ -163,9 +164,9 @@ class PersonalAssistant:
             elif new_phones != '':
                 contact.phone = [phone.strip() for phone in new_phones]
             elif new_mails != '':
-                contact.birthday = Birthday(new_birthday)
+                contact.mails = [mail.strip() for mail in new_mails]
             elif new_birthday != '':
-                contact.mails = [mail.strip() for mail in new_mails]  
+                contact.birthday = Birthday(new_birthday)  
             elif new_address != '': 
                 contact.address = new_address
             print(f'Contact {name} redactioned successfully')
@@ -361,6 +362,21 @@ def main():
         command = prompt("> ", completer=completer).lower()
 
         try:
+            table_adressbook = Table(
+                    Column("Name", justify="center"),
+                    Column("Phones", justify="center"),
+                    Column("Mails", justify="center"),
+                    Column("Birthday", justify="center"),
+                    Column("Address", justify="center"),
+                )
+            table = Table(
+                    Column(header='Name', justify='center'),
+                    Column(header='Description', justify='center'),
+                    Column(header='Tag', justify='center'),
+                    Column(header='Date', justify='center'),
+                    title='NoteBook',
+                    show_lines=True
+                )
             if command == 'help':
                 print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
             elif command == 'add_contact':
@@ -371,7 +387,7 @@ def main():
                 assistant.get_birthdays()
             elif command == 'search_contact':
                 name = input('Enter name to search: ')
-                assistant.search_contact(name)
+                assistant.search_contact(name, table_adressbook)
             elif command == 'edit_contact':
                 name = input('Enter contact name to edit: ')
                 assistant.edit_contact(name)
@@ -387,37 +403,21 @@ def main():
                     print("Done")
                 else:
                     print("You wrote a wrong directory")
-
             elif command == 'exit':
                 print("Goodbye!")
                 break
-
-            elif command in ['add-note', 'all-note', 'sort-note', 'find-note', 'change-note', 'delete-note', 'close', 'exit', 'good bye']:
-                table = Table(
-                    Column(header='Name', justify='center'),
-                    Column(header='Description', justify='center'),
-                    Column(header='Tag', justify='center'),
-                    Column(header='Date', justify='center'),
-                    title='NoteBook',
-                    show_lines=True
-                )
-
-                if command == 'add-note':
-                    nbook.add_note(table)
-                elif command == 'all-note':
-                    nbook.all_note(table)
-                elif command == 'sort-note':
-                    nbook.sort_note(table)
-                elif command == 'find-note':
-                    nbook.find_note(table)
-                elif command == 'change-note':
-                    nbook.change_note(table)
-                elif command == 'delete-note':
-                    nbook.delete_note(table)
-                elif command in ['close', 'exit', 'good bye']:
-                    print(nbook.bye())
-                else:
-                    print("Unknown command. Type 'help' for a list of available commands")
+            elif command == 'add-note':
+                nbook.add_note(table)
+            elif command == 'all-note':
+                nbook.all_note(table)
+            elif command == 'sort-note':
+                nbook.sort_note(table)
+            elif command == 'find-note':
+                nbook.find_note(table)
+            elif command == 'change-note':
+                nbook.change_note(table)
+            elif command == 'delete-note':
+                nbook.delete_note(table)
             else:
                 print("Unknown command. Type 'help' for a list of available commands")
         finally:
