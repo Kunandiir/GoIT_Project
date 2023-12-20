@@ -108,21 +108,26 @@ class PersonalAssistant:
                 break
 
         while True:
-            inputs = input('Enter birthday (dd.mm.yyyy): ')
+            new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
             try:
-                record.birthday = Birthday(inputs)
-                break
+                birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
+                if birthday_date > datetime.now():
+                    print("Entered birthday is in the future. Please enter a valid date.")
+                else:
+                    record.birthday = Birthday(new_birthday)
+                    break
             except ValueError:
-                print("Incorrect birthday date format. Use the format dd.mm.yyyy.")      
+                print("Incorrect birthday date format. Use the format dd.mm.yyyy.")
 
         inputs = input('Enter address: ')
         record.address = inputs
         self.contacts.append(record)
     
-    def show_contacts(self):
+    def show_contacts(self, table_adressbook):
         for contact in self.contacts:
-            print('Name: ' + contact.name + ', phones: ' + ','.join(contact.phones) + ', mails: ' + ','.join(contact.mails) + ', address: ' + contact.address + ', birthday: ' + str(contact.birthday.value))
-        
+            table_adressbook.add_row(contact.name, ",".join(contact.phones), ",".join(contact.mails), str(contact.birthday.value), contact.address)
+        self.console.print(table_adressbook)
+
     # task_2/ return a list of contacts whose birthday is after a specified number of days from the current date
     def get_birthdays(self):
         days = int(input('Enter amount of days: '))
@@ -149,33 +154,48 @@ class PersonalAssistant:
         
 
     # task 5
-    def edit_contact(self, name):
-        contact = self.search_contact(name) # проходимся по контактах
-        print(contact)
+    def edit_contact(self, name, table_adressbook):
+        contact = self.search_contact(name, table_adressbook) # проходимся по контактах
         if contact:
             print('Enter new information:')
             new_name = input('Enter new name: ')
-            new_phones = input('Enter new phone(s) separated by commas: ').split(',')
-            new_mails = input('Enter new email(s) separated by commas: ').split(',')
-            new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
-            new_address = input('Enter new address: ')
-            if new_name != '':
-                contact.name = new_name
-            elif new_phones != '':
-                contact.phone = [phone.strip() for phone in new_phones]
-            elif new_mails != '':
-                contact.mails = [mail.strip() for mail in new_mails]
-            elif new_birthday != '':
-                contact.birthday = Birthday(new_birthday)  
-            elif new_address != '': 
-                contact.address = new_address
-            print(f'Contact {name} redactioned successfully')
+            contact.name = new_name
+            while True:
+                new_phones = input('Enter new phone: ')
+                new_phones = new_phones.replace(',', '')  # Remove commas
+                if not re.match(r'^\+\d{1,4}\d{6,}$', new_phones):
+                    print("Invalid phone number. Please provide a valid numeric phone number (one to four digits (the country code) and at least six more digits).")
+                else:
+                    contact.phones = [new_phones]
+                    break
+            while True:
+                new_mails = input('Enter new email: ')
+                if not new_mails or not re.match(email_regex, new_mails):
+                    print("Invalid email. Please provide a valid email address.")
+                else:
+                    contact.mails = [new_mails]
+                    break
+            while True:
+                new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
+                try:
+                    birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
+                    if birthday_date > datetime.now():
+                        print("Entered birthday is in the future. Please enter a valid date.")
+                    else:
+                        contact.birthday = Birthday(new_birthday)
+                        break
+                except ValueError:
+                    print("Incorrect birthday date format. Use the format dd.mm.yyyy.")
 
-    def delete_contact(self, name):
-        contact = self.search_contact(name) #проходимся по контактах
+            new_address = input('Enter new address: ')
+            contact.address = new_address
+            self.console.print(f'[green]Contact {name} redactioned successfully.[/]')
+
+    def delete_contact(self, name, table_adressbook):
+        contact = self.search_contact(name, table_adressbook) #проходимся по контактах
         if contact:
             self.contacts.remove(contact)
-            print(f'Contact {name} deleted successfully')
+            self.console.print(f'[green]Contact {name} deleted successfully.[/]')
 
 
 #    task_11(self):
@@ -373,6 +393,8 @@ def main():
                     Column("Mails", justify="center"),
                     Column("Birthday", justify="center"),
                     Column("Address", justify="center"),
+                    title='Adress Book',
+                    show_lines=True
                 )
             table = Table(
                     Column(header='Name', justify='center'),
@@ -387,7 +409,7 @@ def main():
             elif command == 'add_contact':
                 assistant.add_contact()
             elif command == 'show_contacts':
-                assistant.show_contacts()
+                assistant.show_contacts(table_adressbook)
             elif command == "birthday_day":
                 assistant.get_birthdays()
             elif command == 'search_contact':
@@ -395,10 +417,10 @@ def main():
                 assistant.search_contact(name, table_adressbook)
             elif command == 'edit_contact':
                 name = input('Enter contact name to edit: ')
-                assistant.edit_contact(name)
+                assistant.edit_contact(name, table_adressbook)
             elif command == 'delete_contact':
                 name = input('Enter contact name to delete: ')
-                assistant.delete_contact(name)
+                assistant.delete_contact(name, table_adressbook)
             elif command.lower() == 'clean':
                 path = input("Write a path: ")
 
