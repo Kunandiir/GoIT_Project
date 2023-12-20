@@ -354,8 +354,6 @@ def main():
         nbook.create_table()
     except:
         pass
-    
-    nbook.dump_note()
 
     assistant = PersonalAssistant()
     commands = ['add_contact','show_contacts', "birthday_day", 'help', 'search_contact',
@@ -368,6 +366,7 @@ def main():
         command = prompt("> ", completer=completer).lower()
 
         try:
+            nbook.dump_note()
             table_adressbook = Table(
                     Column("Name", justify="center"),
                     Column("Phones", justify="center"),
@@ -409,21 +408,21 @@ def main():
                     print("Done")
                 else:
                     print("You wrote a wrong directory")
+            elif command == 'add_note':
+                nbook.add_note(table)
+            elif command == 'all_note':
+                nbook.all_note(table)
+            elif command == 'sort_note':
+                nbook.sort_note(table)
+            elif command == 'find_note':
+                nbook.find_note(table)
+            elif command == 'change_note':
+                nbook.change_note(table)
+            elif command == 'delete_note':
+                nbook.delete_note(table)
             elif command == 'exit':
                 print("Goodbye!")
                 break
-            elif command == 'add-note':
-                nbook.add_note(table)
-            elif command == 'all-note':
-                nbook.all_note(table)
-            elif command == 'sort-note':
-                nbook.sort_note(table)
-            elif command == 'find-note':
-                nbook.find_note(table)
-            elif command == 'change-note':
-                nbook.change_note(table)
-            elif command == 'delete-note':
-                nbook.delete_note(table)
             else:
                 print("Unknown command. Type 'help' for a list of available commands")
         finally:
