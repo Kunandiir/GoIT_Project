@@ -15,7 +15,7 @@ import pickle
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table, Column
-from notes import NoteBook
+from goit_project.notes import NoteBook
 
 
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -46,7 +46,10 @@ class Birthday(Field):
 
 # class Record stores all contacts information
 class Record():
+    _record_id = 0
     def __init__(self, name, birthday = None, address = None) -> None:
+        Record._record_id += 1
+        self.id = Record._record_id
         self.name = name
         self.phones = []
         self.mails = []
@@ -55,7 +58,7 @@ class Record():
 
     # to see what Record contains
     def __str__(self) -> str:
-        return f"Name: {self.name}, Phones: {[phone for phone in self.phones]}, Mails: {[mail for mail in self.mails]}, Birthday: {self.birthday.value}, Address: {self.address}"
+        return f"ID:{self.id},Name: {self.name}, Phones: {[phone for phone in self.phones]}, Mails: {[mail for mail in self.mails]}, Birthday: {self.birthday.value}, Address: {self.address}"
     
 
 
@@ -67,6 +70,8 @@ class PersonalAssistant:
         self.notes = []
         self.file_path = Path.home() / "personal_assistant_data.pkl"
         self.load_data()
+        if len(self.contacts) > 0:
+            Record._record_id = len(self.contacts)
         atexit.register(self.save_data_on_exit)  # Register the function for atexit
         self.console = Console()
 
@@ -122,7 +127,14 @@ class PersonalAssistant:
         inputs = input('Enter address: ')
         record.address = inputs
         self.contacts.append(record)
-    
+
+    def restor_id(self):
+        record_id = 0
+        for contact in self.contacts:
+            record_id += 1
+            contact.id = record_id
+            Record._record_id = record_id
+
     def show_contacts(self, table_adressbook):
         for contact in self.contacts:
             table_adressbook.add_row(contact.name, ",".join(contact.phones), ",".join(contact.mails), str(contact.birthday.value), contact.address)
@@ -192,10 +204,13 @@ class PersonalAssistant:
             self.console.print(f'[green]Contact {name} redactioned successfully.[/]')
 
     def delete_contact(self, name, table_adressbook):
+        
         contact = self.search_contact(name, table_adressbook) #проходимся по контактах
         if contact:
             self.contacts.remove(contact)
             self.console.print(f'[green]Contact {name} deleted successfully.[/]')
+        
+        self.restor_id()
 
 
 #    task_11(self):
