@@ -24,11 +24,12 @@ class NoteBook(UserList):
         self.db = sqlite3.connect(f'{Path.home()}/notes.db')
         self.cursor = self.db.cursor()
         super().__init__()
-      
+    
     
     def create_table(self):
         self.cursor.execute(
                 '''CREATE TABLE cls_notes (
+                id INTEGER PRIMARY KEY,
                 name TEXT,
                 desc STR,
                 tag STR,
@@ -46,16 +47,23 @@ class NoteBook(UserList):
         
     
     def all_note(self, table: Table):
-        for note in self.data:
-            table.add_row(note['name'], note['desc'], note['tag'], note['date'])
-        self.console.print(table)
-        
+        if self.data:
+            for note in self.data:
+                table.add_row(note['name'], note['desc'], note['tag'], note['date'])
+                print(note)
+            self.console.print(table)
+        else:
+            self.console.print('[bold red]Нотатки пусті[/]')
+    
     
     def sort_note(self, table: Table):
-        self.cursor.execute("SELECT * FROM cls_notes ORDER BY tag")
-        for note in self.cursor.fetchall():
-            table.add_row(note[0], note[1], note[2], note[3])
-        self.console.print(table)
+        if self.data:
+            self.cursor.execute("SELECT * FROM cls_notes ORDER BY tag")
+            for note in self.cursor.fetchall():
+                table.add_row(note[1], note[2], note[3], note[4])
+            self.console.print(table)
+        else:
+            self.console.print('[bold red]Нотатки пусті[/]')
         
 
     def find_note(self, table: Table):
@@ -92,13 +100,12 @@ class NoteBook(UserList):
             note = self.find_note(table)
             if not note:
                 continue
-            yn = Prompt.ask(f'Цю нотатку ви бажали знайти?', choices=['y','n'])
+            yn = Prompt.ask(f'Цю нотатку ви бажали видалити?', choices=['y','n'])
             if yn == 'y':           
                 self.data.remove(note)
-                self.console.print(table)
+                self.console.print('[green]Успішно видалено[/]')
                 break
 
-    
     
     def load_note(self):
         self.cursor.execute(f"DELETE FROM cls_notes")
@@ -111,8 +118,9 @@ class NoteBook(UserList):
 
     def dump_note(self):
         self.cursor.execute("SELECT * FROM cls_notes")
+        self.data = []
         for note in self.cursor.fetchall():
-            dict_note = {'name': note[0], 'desc': note[1], 'tag': note[2], 'date': note[3]}
+            dict_note = {'id': note[0], 'name': note[1], 'desc': note[2], 'tag': note[3], 'date': note[4]}
             self.data.append(dict_note)    
         # print('Dump')
 
@@ -124,15 +132,15 @@ class NoteBook(UserList):
 
 def main():
     nbook = NoteBook()
-
+    
     try:
         nbook.create_table()
     except:
-        pass    
+        pass
     
-    nbook.dump_note()
     while True:
         try:
+            nbook.dump_note()
             table = Table(
                     Column(header='Name', justify='center'),
                     Column(header='Description', justify='center'),
@@ -155,7 +163,7 @@ def main():
             elif enter == 'delete-note':
                 nbook.delete_note(table)
             elif enter in ['close', 'exit', 'good bye']:
-                print(nbook.bye())
+                nbook.bye()
             else:
                 print('Wrong command(')
         finally:
