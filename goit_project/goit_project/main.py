@@ -63,9 +63,6 @@ class Record():
         return f"ID:{self.id},Name: {self.name}, Phones: {[phone for phone in self.phones]}, Mails: {[mail for mail in self.mails]}, Birthday: {self.birthday.value}, Address: {self.address}"
     
 
-
-
-
 class PersonalAssistant:
     def __init__(self):
         self.contacts = []
@@ -91,44 +88,48 @@ class PersonalAssistant:
 
     def save_data_on_exit(self):
         self.save_data()
-        print("Data saved before exiting.")
+        self.console.print("[green]Data saved before exiting.[/]")
 
     def add_contact(self):
         
-        inputs = input('Enter name: ')
+        inputs = input('Enter name [Example: Name]: ')
         record = Record(inputs)
 
         while True:
-            inputs = input('Enter phone number: ')
-            if not re.match(r'^\+\d{1,4}\d{6,}$', inputs):
-                print("Invalid phone number. Please provide a valid numeric phone number (one to four digits (the country code) and at least six more digits).")
-            else:
-                record.phones.append(inputs)
-                break
-
-        while True:
-            inputs = input('Enter maill: ')
-            if not inputs or not re.match(email_regex, inputs):
-                print("Invalid email. Please provide a valid email address.")
-            else:
-                record.mails.append(inputs)
-                break
-
-        while True:
-            new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
-            try:
-                birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
-                if birthday_date > datetime.now():
-                    print("Entered birthday is in the future. Please enter a valid date.")
+            inputs = input('Enter phone number [Example: +00000000]: ')
+            if inputs !='':
+                if not re.match(r'^\+\d{1,4}\d{6,}$', inputs):
+                    self.console.print("[red]Invalid phone number.[/]")
                 else:
-                    record.birthday = Birthday(new_birthday)
+                    record.phones.append(inputs)
                     break
-            except ValueError:
-                print("Incorrect birthday date format. Use the format dd.mm.yyyy.")
 
-        inputs = input('Enter address: ')
-        record.address = inputs
-        self.contacts.append(record)
+        while True:
+            inputs = input('Enter maill [Example: mail@ua.com]: ')
+            if inputs !='':
+                if not inputs or not re.match(email_regex, inputs):
+                    self.console.print("[red]Invalid email. Please provide a valid email address.[/]")
+                else:
+                    record.mails.append(inputs)
+                    break
+
+        while True:
+            new_birthday = input('Enter new birthday [Example: 11.11.1111]: ')
+            if new_birthday != '':
+                try:
+                    birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
+                    if birthday_date > datetime.now():
+                        self.console.print("[red]Entered birthday is in the future. Please enter a valid date.[/]")
+                    else:
+                        record.birthday = Birthday(new_birthday)
+                        break
+                except ValueError:
+                    self.console.print("[red]Incorrect birthday date format. Use the format dd.mm.yyyy.[/]")
+
+        inputs = input('Enter address [Example: address]: ')
+        if inputs != '':
+            record.address = inputs
+            self.contacts.append(record)
 
     def restor_id(self):
         record_id = 0
@@ -143,7 +144,7 @@ class PersonalAssistant:
         self.console.print(table_adressbook)
 
     # task_2/ return a list of contacts whose birthday is after a specified number of days from the current date
-    def get_birthdays(self):
+    def get_birthdays(self, table_adressbook):
         days = int(input('Enter amount of days: '))
         today = datetime.today()
         next_birthday = today.date() + timedelta(days=days)
@@ -152,8 +153,8 @@ class PersonalAssistant:
             if ignor_year < today.date():
                 ignor_year = ignor_year.replace(year = today.year +1)
             if today.date() <= ignor_year <= next_birthday:
-                print(f'\n{user.name}, {user.phones}')
-
+                table_adressbook.add_row(user.name, ",".join(user.phones), ",".join(user.mails), str(user.birthday.value), user.address)
+        self.console.print(table_adressbook)
 
 
     # task 4
@@ -171,38 +172,49 @@ class PersonalAssistant:
     def edit_contact(self, name, table_adressbook):
         contact = self.search_contact(name, table_adressbook) # проходимся по контактах
         if contact:
-            print('Enter new information:')
+            print('Enter new information: ')
             new_name = input('Enter new name: ')
-            contact.name = new_name
+            if new_name != '':
+                contact.name = new_name
             while True:
-                new_phones = input('Enter new phone: ')
-                new_phones = new_phones.replace(',', '')  # Remove commas
-                if not re.match(r'^\+\d{1,4}\d{6,}$', new_phones):
-                    print("Invalid phone number. Please provide a valid numeric phone number (one to four digits (the country code) and at least six more digits).")
-                else:
-                    contact.phones = [new_phones]
-                    break
-            while True:
-                new_mails = input('Enter new email: ')
-                if not new_mails or not re.match(email_regex, new_mails):
-                    print("Invalid email. Please provide a valid email address.")
-                else:
-                    contact.mails = [new_mails]
-                    break
-            while True:
-                new_birthday = input('Enter new birthday, use format dd.mm.yyyy: ')
-                try:
-                    birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
-                    if birthday_date > datetime.now():
-                        print("Entered birthday is in the future. Please enter a valid date.")
+                new_phones = input('Enter phone number [Example: +00000000]: ')
+                if new_phones !='':
+                    new_phones = new_phones.replace(',', '')  # Remove commas
+                    if not re.match(r'^\+\d{1,4}\d{6,}$', new_phones):
+                        self.console.print("[red]Invalid phone number.[/]")
                     else:
-                        contact.birthday = Birthday(new_birthday)
+                        contact.phones = [new_phones]
                         break
-                except ValueError:
-                    print("Incorrect birthday date format. Use the format dd.mm.yyyy.")
+                else:
+                    break
+            while True:
+                new_mails = input('Enter maill [Example: mail@ua.com]: ')
+                if new_mails != '':
+                    if not new_mails or not re.match(email_regex, new_mails):
+                        self.console.print("[red]Invalid email. Please provide a valid email address.[/]")
+                    else:
+                        contact.mails = [new_mails]
+                        break
+                else:
+                    break
+            while True:
+                new_birthday = input('Enter new birthday [Example: 11.11.1111]: ')
+                if new_birthday != '':
+                    try:
+                        birthday_date = datetime.strptime(new_birthday, '%d.%m.%Y')
+                        if birthday_date > datetime.now():
+                            self.console.print("[red]Entered birthday is in the future. Please enter a valid date.[/]")
+                        else:
+                            contact.birthday = Birthday(new_birthday)
+                            break
+                    except ValueError:
+                        self.console.print("[red]Incorrect birthday date format. Use the format dd.mm.yyyy.[/]")
+                else:
+                    break
 
             new_address = input('Enter new address: ')
-            contact.address = new_address
+            if new_address != '':
+                contact.address = new_address
             self.console.print(f'[green]Contact {name} redactioned successfully.[/]')
 
     def delete_contact(self, name, table_adressbook):
@@ -422,13 +434,15 @@ def main():
                     show_lines=True
                 )
             if command == 'help':
-                print("Available commands: exit, add_contact, birthday_day, search_contact, redaction_contact, delete_contact")
+                print("Available commands: add_contact, show_contacts, birthday_day, " +
+                       "search_contact, edit_contact, delete_contact, clean, add_note, all_note, sort_note, " +
+                      "find_note, change_note, delete_note, exit")
             elif command == 'add_contact':
                 assistant.add_contact()
             elif command == 'show_contacts':
                 assistant.show_contacts(table_adressbook)
             elif command == "birthday_day":
-                assistant.get_birthdays()
+                assistant.get_birthdays(table_adressbook)
             elif command == 'search_contact':
                 name = input('Enter name to search: ')
                 assistant.search_contact(name, table_adressbook)
