@@ -15,7 +15,9 @@ import pickle
 from rich.console import Console
 from rich.prompt import Prompt
 from rich.table import Table, Column
-from goit_project.notes import NoteBook
+try:
+    from goit_project.notes import NoteBook
+except: from notes import NoteBook
 
 
 email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
