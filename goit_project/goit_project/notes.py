@@ -55,7 +55,6 @@ class NoteBook(UserList):
         if self.data:
             for note in self.data:
                 table.add_row(note['name'], note['desc'], note['tag'], note['date'])
-                print(note)
             self.console.print(table)
         else:
             self.console.print('[bold red]Notes are empty[/]')

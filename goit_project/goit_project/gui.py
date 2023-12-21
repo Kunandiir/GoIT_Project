@@ -1,7 +1,11 @@
 import tkinter as tk
 from tkinter import filedialog
-from goit_project.main import PersonalAssistant,Record,Birthday,CleanFolder
-from goit_project.notes import NoteBook,Note,Path
+try:
+    from goit_project.main import PersonalAssistant,Record,Birthday,CleanFolder
+    from goit_project.notes import NoteBook,Note,Path
+except:
+    from main import PersonalAssistant,Record,Birthday,CleanFolder
+    from notes import NoteBook,Note,Path
 import customtkinter as ctk
 import re
 ctk.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
