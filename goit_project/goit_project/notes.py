@@ -39,11 +39,16 @@ class NoteBook(UserList):
         
       
     def add_note(self, table: Table):
-        record = Note(input('Enter name: '), input('Enter desc: '), input('Enter tag: '))
-        dict_record = {'name': record.name, 'desc': record.desc, 'tag': record.tag, 'date': record.date}
-        self.data.append(dict_record)
-        table.add_row(dict_record['name'], dict_record['desc'], dict_record['tag'], dict_record['date'])
-        self.console.print(table)
+        while True:
+            record = Note(input('Enter name: '), input('Enter desc: '), input('Enter tag: '))
+            if (record.name and record.desc and record.tag) and (record.name != ' ' and record.desc != ' ' and record.tag != ' '):
+                dict_record = {'name': record.name, 'desc': record.desc, 'tag': record.tag, 'date': record.date}
+                self.data.append(dict_record)
+                table.add_row(dict_record['name'], dict_record['desc'], dict_record['tag'], dict_record['date'])
+                self.console.print(table)
+                break
+            else:
+                self.console.print('[red]Try again[/]')
         
     
     def all_note(self, table: Table):
@@ -53,7 +58,7 @@ class NoteBook(UserList):
                 print(note)
             self.console.print(table)
         else:
-            self.console.print('[bold red]Нотатки пусті[/]')
+            self.console.print('[bold red]Notes are empty[/]')
     
     
     def sort_note(self, table: Table):
@@ -63,21 +68,21 @@ class NoteBook(UserList):
                 table.add_row(note[1], note[2], note[3], note[4])
             self.console.print(table)
         else:
-            self.console.print('[bold red]Нотатки пусті[/]')
+            self.console.print('[bold red]Notes are empty[/]')
         
 
     def find_note(self, table: Table):
         if self.data:
-            key = Prompt.ask('Введіть параметр', choices=['name', 'desc', 'tag'])
-            value = input('Введіть значення: ')
+            key = Prompt.ask('Enter a parameter to search for', choices=['name', 'desc', 'tag'])
+            value = input('Enter the value: ')
             for note in self.data:
                 if value in note[key]:
                     table.add_row(note['name'], note['desc'], note['tag'], note['date'])
                     self.console.print(table)
                     return note
-            self.console.print(f'[red]Нотатки з параметром "{key}" та значенням "{value}" не знайдено.[/]')
+            self.console.print(f'[red]Notes with parameter "{key}" and value "{value}" not found.[/]')
         else:
-            self.console.print('[bold red]Нотатки пусті[/]')
+            self.console.print('[bold red]Notes are empty[/]')
 
 
     def change_note(self, table: Table):
@@ -85,10 +90,10 @@ class NoteBook(UserList):
             note = self.find_note(table)
             if not note:
                 continue
-            yn = Prompt.ask(f'Цю нотатку ви бажали знайти?', choices=['y','n'])
+            yn = Prompt.ask(f'Is this the note you wanted to find?', choices=['y','n'])
             if yn == 'y':
-                key = Prompt.ask('Введіть параметр який бажаєте змінити', choices=['name', 'desc', 'tag'])
-                value = input('Введіть значення: ')
+                key = Prompt.ask('Enter the parameter you want to change', choices=['name', 'desc', 'tag'])
+                value = input('Enter the value: ')
                 note[key] = value
                 table.add_row(note['name'], note['desc'], note['tag'], note['date'])
                 self.console.print(table)
@@ -100,10 +105,10 @@ class NoteBook(UserList):
             note = self.find_note(table)
             if not note:
                 continue
-            yn = Prompt.ask(f'Цю нотатку ви бажали видалити?', choices=['y','n'])
+            yn = Prompt.ask(f'Is this the note you want to delete?', choices=['y','n'])
             if yn == 'y':           
                 self.data.remove(note)
-                self.console.print('[green]Успішно видалено[/]')
+                self.console.print('[green]Succsessfully deleted[/]')
                 break
 
     
