@@ -65,7 +65,7 @@ class NoteBook(UserList):
         if self.data:
             self.cursor.execute("SELECT * FROM cls_notes ORDER BY tag")
             for note in self.cursor.fetchall():
-                table.add_row(note[1], note[2], note[3], note[4])
+                table.add_row(str(note[1]), str(note[2]), str(note[3]), str(note[4]))
             self.console.print(table)
         else:
             self.console.print('[bold red]Notes are empty[/]')
@@ -125,7 +125,7 @@ class NoteBook(UserList):
         self.cursor.execute("SELECT * FROM cls_notes")
         self.data = []
         for note in self.cursor.fetchall():
-            dict_note = {'id': note[0], 'name': note[1], 'desc': note[2], 'tag': note[3], 'date': note[4]}
+            dict_note = {'id': note[0], 'name': str(note[1]), 'desc': str(note[2]), 'tag': str(note[3]), 'date': str(note[4])}
             self.data.append(dict_note)    
         # print('Dump')
 
