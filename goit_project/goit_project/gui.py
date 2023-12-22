@@ -1,11 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
+
 try:
     from goit_project.main import PersonalAssistant,Record,Birthday,CleanFolder
     from goit_project.notes import NoteBook,Note,Path
 except:
     from main import PersonalAssistant,Record,Birthday,CleanFolder
     from notes import NoteBook,Note,Path
+from datetime import datetime
 import customtkinter as ctk
 import re
 ctk.set_appearance_mode("System")  # Modes: "System" (standard), "Dark", "Light"
@@ -115,26 +117,53 @@ class App(ctk.CTk):
         input_form.grid_columnconfigure(0, weight=1)
         input_form.grid_rowconfigure((0, 1, 2), weight=1)
         phone_frame =  ctk.CTkFrame(input_form)
-        phone_frame.grid_columnconfigure((0,1), weight=1)
+        phone_frame.grid_columnconfigure((0,1,2), weight=1)
         phone_frame.grid(row=0,column=0,padx=10,pady=(10,0),sticky='nsew')
         name_label = ctk.CTkEntry(phone_frame,placeholder_text="Name",font=ctk.CTkFont(size=18, weight="bold"))
         name_label.grid(row=0,column=0,rowspan=2,padx=0,pady=0, sticky='nsw')
-        address_label = ctk.CTkEntry(phone_frame, placeholder_text="Address",font=ctk.CTkFont(size=15, weight="bold"))
-        address_label.grid(row=0,column=1,padx=0,pady=0,sticky='nse')
-        birthday_label = ctk.CTkEntry(phone_frame,placeholder_text="Birthday",font=ctk.CTkFont(size=15, weight="bold"))
-        birthday_label.grid(row=1,column=1,padx=0,pady=0,sticky='nse')
-        for r in range(3):
-            phone_label = ctk.CTkEntry(phone_frame,placeholder_text="Number",font=ctk.CTkFont(size=10, weight="bold"))
-            phone_label.grid(row=3+r,column=0,padx=0,pady=1,sticky='ns')
-            mail_label = ctk.CTkEntry(phone_frame,placeholder_text="Mail",font=ctk.CTkFont(size=10, weight="bold"))
-            mail_label.grid(row=3+r,column=1,padx=0,pady=1,sticky='ns')
-            form_phone_list.append(phone_label)
-            form_mail_list.append(mail_label)
+        address_label = ctk.CTkEntry(phone_frame, placeholder_text="Address",font=ctk.CTkFont(size=10, weight="bold"))
+        address_label.grid(row=0,column=2,padx=0,pady=0,sticky='nse')
+        birthday_label = ctk.CTkEntry(phone_frame,placeholder_text="Birthday(dd.mm.yyyy)",font=ctk.CTkFont(size=10, weight="bold"))
+        birthday_label.bind("<Key>", lambda event: self.validate_date_input(event, birthday_label, submit_button))
+        birthday_label.grid(row=1,column=2,padx=0,pady=0,sticky='nse')
+
+        phone_label = ctk.CTkEntry(phone_frame,placeholder_text="Number:(+){5-13}",font=ctk.CTkFont(size=10, weight="bold"))
+        phone_label.bind("<Key>", lambda event: self.validate_number_input(event, phone_label, submit_button))
+        phone_label.grid(row=3,column=0,padx=0,pady=(5,0),sticky='ns')
+        mail_label = ctk.CTkEntry(phone_frame,placeholder_text="Mail",font=ctk.CTkFont(size=10, weight="bold"))
+        mail_label.bind("<Key>", lambda event: self.validate_mail_input(event, mail_label, submit_button))
+        mail_label.grid(row=3,column=2,padx=0,pady=(5,0),sticky='ns')
+        form_phone_list.append(phone_label)
+        form_mail_list.append(mail_label)
+        
+        add_button = ctk.CTkButton(phone_frame, text='Add', command=lambda: self.add_entry(phone_frame,form_phone_list,form_mail_list, submit_button))
+        add_button.grid(row=0, column=1, padx=5, pady=0, sticky='nswe')
+        
+        delete_button = ctk.CTkButton(phone_frame, text='Delete', command=lambda: self.delete_entry(form_phone_list, form_mail_list))
+        delete_button.grid(row=1, column=1, padx=5, pady=0, sticky='nswe')
+
         submit_button = ctk.CTkButton(input_form, text='Submit', command=lambda: self.add_new_contact(name_label.get(),birthday_label.get(),address_label.get(),[phone.get() for phone in form_phone_list],[mail.get() for mail in form_mail_list]))
         submit_button.grid(row=1,column=0, columnspan=2,padx=0,pady=0, sticky='nwe')
 
         input_form.protocol("WM_DELETE_WINDOW", lambda: [self.attributes('-disabled', False), input_form.destroy()])
    
+    def add_entry(self, phone_frame, form_phone_list, form_mail_list, submit_button):
+        phone_label = ctk.CTkEntry(phone_frame, placeholder_text="Number:(+){5-13}", font=ctk.CTkFont(size=10, weight="bold"))
+        phone_label.bind("<Key>", lambda event: self.validate_number_input(event, phone_label, submit_button))
+        phone_label.grid(row=len(form_phone_list)+3, column=0, padx=0, pady=1, sticky='ns')
+        mail_label = ctk.CTkEntry(phone_frame, placeholder_text="Mail", font=ctk.CTkFont(size=10, weight="bold"))
+        mail_label.bind("<Key>", lambda event: self.validate_mail_input(event, mail_label, submit_button))
+        mail_label.grid(row=len(form_mail_list)+3, column=2, padx=0, pady=1, sticky='ns')
+        form_phone_list.append(phone_label)
+        form_mail_list.append(mail_label)
+    
+    def delete_entry(self, form_phone_list, form_mail_list):
+        if form_phone_list and form_mail_list:  # Check if there are entries to delete
+            form_phone_list[-1].grid_forget()  # Remove last phone entry from grid
+            form_mail_list[-1].grid_forget()  # Remove last mail entry from grid
+            form_phone_list.pop()  # Remove last phone entry from list
+            form_mail_list.pop()  # Remove last mail entry from list
+
     # Generate frame whith editable contact information
     def generate_edit_contact_frame(self, id):
         contact = assistant.contacts[id-1]
@@ -147,30 +176,43 @@ class App(ctk.CTk):
         input_form.grid_columnconfigure(0, weight=1)
         input_form.grid_rowconfigure((0, 1, 2), weight=1)
         phone_frame =  ctk.CTkFrame(input_form)
-        phone_frame.grid_columnconfigure((0,1), weight=1)
+        phone_frame.grid_columnconfigure((0,1,2), weight=1)
         phone_frame.grid(row=0,column=0,padx=10,pady=(10,0),sticky='nsew')
-        name_label = ctk.CTkEntry(phone_frame,placeholder_text=contact.name,font=ctk.CTkFont(size=18, weight="bold"))
+        name_label = ctk.CTkEntry(phone_frame,placeholder_text="Name",font=ctk.CTkFont(size=18, weight="bold"))
         name_label.insert(0, contact.name)
-        name_label.grid(row=0,column=0,rowspan=2,padx=0,pady=0, sticky='nsw')
-        address_label = ctk.CTkEntry(phone_frame, placeholder_text=contact.address,font=ctk.CTkFont(size=15, weight="bold"))
-        address_label.insert(0, contact.address)
-        address_label.grid(row=0,column=1,padx=0,pady=0,sticky='nse')
-        birthday_label = ctk.CTkEntry(phone_frame,placeholder_text=contact.birthday.value,font=ctk.CTkFont(size=15, weight="bold"))
+        name_label.grid(row=0,column=0,rowspan=2,padx=0,pady=(0, 5), sticky='nsw')
+        address_label = ctk.CTkEntry(phone_frame, placeholder_text="Address",font=ctk.CTkFont(size=10, weight="bold"))
+        if contact.address !='':
+            address_label.insert(0, contact.address)
+        address_label.grid(row=0,column=2,padx=0,pady=0,sticky='nse')
+        birthday_label = ctk.CTkEntry(phone_frame,placeholder_text="Birthday(dd.mm.yyyy)",font=ctk.CTkFont(size=10, weight="bold"))
+        birthday_label.bind("<Key>", lambda event: self.validate_date_input(event, birthday_label, submit_button))
         if contact.birthday.value != None:
-            birthday_label.insert(0, contact.birthday.value)
-        birthday_label.grid(row=1,column=1,padx=0,pady=0,sticky='nse')
+            birthday_label.insert(0, contact.birthday.value.strftime('%d.%m.%Y'))
+        birthday_label.grid(row=1,column=2,padx=0,pady=(0,5),sticky='nse')
         for r, phone in enumerate(contact.phones):
-            phone_label = ctk.CTkEntry(phone_frame,placeholder_text=phone,font=ctk.CTkFont(size=10, weight="bold"))
-            phone_label.insert(0, phone)
+            phone_label = ctk.CTkEntry(phone_frame,placeholder_text="Number:(+){5-13}",font=ctk.CTkFont(size=10, weight="bold"))
+            if phone != '':
+                phone_label.insert(0, phone)
+            phone_label.bind("<Key>", lambda event: self.validate_number_input(event, phone_label, submit_button))
             phone_label.grid(row=3+r,column=0,padx=0,pady=1,sticky='ns')
             form_phone_list.append(phone_label)
         for r, mail in enumerate(contact.mails):
-            mail_label = ctk.CTkEntry(phone_frame,placeholder_text=mail,font=ctk.CTkFont(size=10, weight="bold"))
-            mail_label.insert(0, mail)
-            mail_label.grid(row=3+r,column=1,padx=0,pady=1,sticky='ns')
+            mail_label = ctk.CTkEntry(phone_frame,placeholder_text="Mail",font=ctk.CTkFont(size=10, weight="bold"))
+            if mail !='':
+                mail_label.insert(0, mail)
+            mail_label.bind("<Key>", lambda event: self.validate_mail_input(event, mail_label, submit_button))
+            mail_label.grid(row=3+r,column=2,padx=0,pady=1,sticky='ns')
             form_mail_list.append(mail_label)
+
         submit_button = ctk.CTkButton(input_form, text='Submit changes', command=lambda: self.edit_contact(id, name_label.get(),birthday_label.get(),address_label.get(),[phone.get() for phone in form_phone_list],[mail.get() for mail in form_mail_list]))
         submit_button.grid(row=1,column=0, columnspan=2,padx=0,pady=0, sticky='nwe')
+        
+        add_button = ctk.CTkButton(phone_frame, text='Add', command=self.add_entry(phone_frame,form_phone_list,form_mail_list, submit_button))
+        add_button.grid(row=0, column=1, padx=5, pady=0, sticky='nswe')
+        
+        delete_button = ctk.CTkButton(phone_frame, text='Delete', command=self.delete_entry(form_phone_list, form_mail_list))
+        delete_button.grid(row=1, column=1, padx=5, pady=0, sticky='nswe')
 
         input_form.protocol("WM_DELETE_WINDOW", lambda: [self.attributes('-disabled', False), input_form.destroy()])
     
@@ -190,7 +232,8 @@ class App(ctk.CTk):
     def edit_contact(self, id, name, birthday, address, phones, mails):
         contact = assistant.contacts[id-1]
         contact.name = name
-        contact.birthday = Birthday(birthday)
+        if birthday != '':
+            contact.birthday = Birthday(birthday)
         contact.address = address
         contact.phones = phones
         contact.mails = mails
@@ -360,30 +403,69 @@ class App(ctk.CTk):
         nbook.dump_note()
         self.generate_notes_list(nbook.data)
 
+    # Validate mail
+    def validate_mail_input(self, event, mail_label, submit_button):
+        value = mail_label.get()
+        if not re.fullmatch(r'^[a-zA-Z0-9_.+-]*(@[a-zA-Z0-9-]*)?(\.[a-zA-Z0-9-.]*)?$', value) and len(value):
+            # If input doesn't match the pattern, schedule the deletion of the last character
+            mail_label.after_idle(lambda: mail_label.delete(len(value)-1))
+            
+    # Validate number
+    def validate_number_input(self, event, phone_label, submit_button):
+    # Schedule the validation to be performed after the new character is added
+        phone_label.after_idle(lambda: self.check_number(phone_label, submit_button))
 
-
-    '''
-    # Validate birthday
-    def validate_date_input(event):
-        value = var.get()
-        if value == '':
-            entry.configure(fg_color='#343638')
+    # Check number
+    def check_number(self, phone_label, submit_button):
+        value = phone_label.get()
+        if not re.fullmatch(r'(\+?\d{0,13}|\d{0,9})?', value) and len(value):
+            # If input doesn't match the pattern, delete the last character
+            phone_label.delete(len(value)-1)
         else:
-            if not re.fullmatch(r'([0-3][0-9]{0,1}\.?)?([0-1][0-9]{0,1}\.?)?([0-9]{0,4})?', value):
-                # If input doesn't match the pattern, delete the last character
-                var.set(value[:-1])
+            phone_label.configure(fg_color='#343638')
+        
+    # Validate birthday
+    def validate_date_input(self, event, birthday_label, submit_button):
+        birthday_label.after_idle(lambda: self.check_date_input(birthday_label, submit_button))
+    
+    
+    def check_date_input(self, birthday_label, submit_button):
+        value = birthday_label.get()
+        if len(value) < 10 and len(value) != 0:
+            birthday_label.after_idle(lambda: birthday_label.configure(fg_color='#343638'))
+            birthday_label.after_idle(lambda: submit_button.configure(state='disabled'))
+        if len(value) > 11:
+            # If input exceeds 10 characters, schedule the deletion of the last character
+            birthday_label.after_idle(lambda: birthday_label.delete(len(value)-1))
+        elif len(value) == 0:
+            birthday_label.after_idle(lambda: birthday_label.configure(fg_color='#343638'))
+            birthday_label.after_idle(lambda: submit_button.configure(state='normal'))
+        else:
+            if not re.fullmatch(r'([0-2]?[0-9]?|3[0-1]?)(\.([0-0]?[1-9]?|1[0-2])?(\.[1-2]?[0-9]{0,3})?)?', value):
+                # If input doesn't match the pattern and the last character is not '.', schedule the deletion of the last character
+                birthday_label.after_idle(lambda: birthday_label.delete(len(value)-1))
             else:
-                try:
-                    # If a full date has been entered, check if it's in the future
-                    entered_date = datetime.strptime(value, '%d.%m.%Y')
-                    today = datetime.today()
-                    if entered_date.date() > today.date():
-                        entry.configure(fg_color='#B5001C')
-                    else:
-                        entry.configure(fg_color='#343638')
-                except:
-                    entry.configure(fg_color='#B5001C')
-        '''
+                # If a full date has been entered, check if it's in the future
+                birthday_label.after_idle(lambda: self.check_date(birthday_label, submit_button))
+        
+    # Check if the entered day is biger then todays day
+    def check_date(self, birthday_label, submit_button):
+        value = birthday_label.get()
+        try:
+            # If a full date has been entered, check if it's in the future
+            if len(value) == 10:  # Check if a full date has been entered
+                entered_date = datetime.strptime(value, '%d.%m.%Y')
+                today = datetime.today()
+                if entered_date.date() > today.date():
+                    birthday_label.configure(fg_color='#B5001C')
+                    submit_button.configure(state='disabled')
+                else:
+                    birthday_label.configure(fg_color='#343638')
+                    submit_button.configure(state='normal')
+        except:
+            birthday_label.configure(fg_color='#343638')
+            submit_button.configure(state='disabled')
+        
 
 def main():
     try:
