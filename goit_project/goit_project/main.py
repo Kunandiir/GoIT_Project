@@ -434,9 +434,7 @@ def main():
                     show_lines=True
                 )
             if command == 'help':
-                print("Available commands: add_contact, show_contacts, birthday_day, " +
-                       "search_contact, edit_contact, delete_contact, clean, add_note, all_note, sort_note, " +
-                      "find_note, change_note, delete_note, exit")
+                print(f"Available commands: {', '.join(commands)}")
             elif command == 'add_contact':
                 assistant.add_contact()
             elif command == 'show_contacts':
